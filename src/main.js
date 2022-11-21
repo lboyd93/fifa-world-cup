@@ -56,7 +56,7 @@ require([
         },
         {
           type: "relationship",
-          relationshipId: 2,
+          relationshipId: 1,
           title: "Victories",
           description:
             "The number of times {COUNTRY} won first place in the FIFA World Cup from 1930-2018.",
@@ -67,35 +67,7 @@ require([
               order: "desc",
             },
           ],
-        },
-        {
-          type: "relationship",
-          relationshipId: 3,
-          title: "Second Place",
-          description:
-            "The number of times {COUNTRY} got second place in the FIFA World Cup from 1930-2018.",
-          displayCount: 2,
-          orderByFields: [
-            {
-              field: "YEAR",
-              order: "desc",
-            },
-          ],
-        },
-        {
-          type: "relationship",
-          relationshipId: 1,
-          title: "Third Place",
-          description:
-            "The number of times {COUNTRY} got third place in the FIFA World Cup from 1930-2018.",
-          displayCount: 2,
-          orderByFields: [
-            {
-              field: "YEAR",
-              order: "desc",
-            },
-          ],
-        },
+        }
       ],
     },
   });
