@@ -3,8 +3,9 @@ require([
   "esri/views/MapView",
   "esri/layers/FeatureLayer",
   "esri/core/reactiveUtils",
-  "esri/widgets/Legend"
-], (Map, MapView, FeatureLayer, reactiveUtils, Legend) => {
+  "esri/widgets/Legend",
+  "esri/rest/query",
+], (Map, MapView, FeatureLayer, reactiveUtils, Legend, query) => {
   const map = new Map({
     basemap: "satellite",
   });
@@ -16,8 +17,8 @@ require([
       dockEnabled: true,
       dockOptions: {
         breakpoint: false,
-        position: "top-right"
-      }
+        position: "top-right",
+      },
     },
   });
 
@@ -32,14 +33,94 @@ require([
         color: null,
         outline: {
           color: "#FEC310",
-          width: 0.5
-        }
+          width: 0.5,
+        },
       },
     },
     popupTemplate: {
       title: "{COUNTRY}",
       outFields: ["*"],
+      fieldInfos: [],
       content: [
+        {
+          type: "custom",
+          outFields: ["*"],
+          creator: async (event) => {
+            const div = document.createElement("div");
+            let value = "";
+            let queryUrl =
+              "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/FIFA_World_Cup/FeatureServer/2";
+            let country = event.graphic.attributes["COUNTRY"];
+
+            let firstPlace = await query.executeForCount(queryUrl, {
+                // autocasts as new Query()
+                where: `First='${country}'`,
+              })
+              .then((count) => {
+                  return count;
+                },
+                (error) => {
+                  console.log(error); // will print error in console if unsupported layers are used
+                }
+              );
+            
+            let secondPlace = await query.executeForCount(queryUrl, {
+                // autocasts as new Query()
+                where: `Second='${country}'`,
+              })
+              .then((count) => {
+                  return count;
+                },
+                (error) => {
+                  console.log(error); // will print error in console if unsupported layers are used
+                }
+              );
+
+            let thirdPlace = await query.executeForCount(queryUrl, {
+                // autocasts as new Query()
+                where: `Third='${country}'`,
+              })
+              .then((count) => {
+                  return count;
+                },
+                (error) => {
+                  console.log(error); // will print error in console if unsupported layers are used
+                }
+              );
+
+              let fourthPlace = await query.executeForCount(queryUrl, {
+                // autocasts as new Query()
+                where: `Fourth='${country}'`,
+              })
+              .then((count) => {
+                  return count;
+                },
+                (error) => {
+                  console.log(error); // will print error in console if unsupported layers are used
+                }
+              );
+            div.innerHTML += `Out of all FIFA World Cup tournaments from 1930-2018, ${country} has won: 
+            <li>First place ${firstPlace} times</li> 
+            <li>Second place ${secondPlace} times</li>
+            <li>Third place ${thirdPlace} times</li>
+            <li>Fourth place ${thirdPlace} times</li>`;
+            return div;
+          },
+        },
+        {
+          type: "relationship",
+          relationshipId: 1,
+          title: "Victories",
+          description:
+            "The number of times {COUNTRY} won first place in the FIFA World Cup from 1930-2018 ordered by most recent. Select Show all to see more.",
+          displayCount: 2,
+          orderByFields: [
+            {
+              field: "YEAR",
+              order: "desc",
+            },
+          ],
+        },
         {
           type: "relationship",
           relationshipId: 0,
@@ -53,23 +134,9 @@ require([
               order: "desc",
             },
           ],
-        },
-        {
-          type: "relationship",
-          relationshipId: 1,
-          title: "Victories",
-          description:
-            "The number of times {COUNTRY} won first place in the FIFA World Cup from 1930-2018.",
-          displayCount: 2,
-          orderByFields: [
-            {
-              field: "YEAR",
-              order: "desc",
-            },
-          ],
         }
-      ],
-    },
+      ]
+    }
   });
 
   // Largest stadium locations for every FIFA World Cup.
@@ -109,7 +176,7 @@ require([
         type: "picture-marker",
         url: "https://lboyd93.github.io/fifa-world-cup/resources/soccerball.svg",
         width: "32px",
-        height: "32px"
+        height: "32px",
       },
     },
   });
@@ -166,19 +233,19 @@ require([
         .then(() => {
           // Create a query from the layerview.
           let query = countriesLayerView.createQuery();
-          query.objectIds = [32]
+          query.objectIds = [32];
           query.outFields = countriesLayerView.availableFields;
           // Query for the Sonoma-Lake-Napa Unit and open it's popup.
           countriesLayerView.queryFeatures(query).then((results) => {
             view.popup.open({
               features: results.features[0],
               location: results.features[0].geometry.centroid,
-              fetchFeatures: true
+              fetchFeatures: true,
             });
           });
         });
     });
   });
 
-  view.ui.add(new Legend({view:view}), "bottom-left");
+  view.ui.add(new Legend({ view: view }), "bottom-left");
 });
