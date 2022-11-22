@@ -112,7 +112,7 @@ require([
           relationshipId: 1,
           title: "Victories",
           description:
-            "The number of times {COUNTRY} won first place in the FIFA World Cup from 1930-2018 ordered by most recent. Select Show all to see more.",
+            "Every FIFA World Cup tournament {COUNTRY} has won first place in from 1930-2018 ordered by most recent.",
           displayCount: 2,
           orderByFields: [
             {
@@ -126,7 +126,7 @@ require([
           relationshipId: 0,
           title: "Stadiums in {Country}",
           description:
-            "Largest stadiums played in for the FIFA World Cup from 1930-2018 in {COUNTRY}.",
+            "Largest stadiums played in for the FIFA World Cup from 1930-2018 in {COUNTRY} ordered by largest attendance.",
           displayCount: 2,
           orderByFields: [
             {
@@ -165,6 +165,9 @@ require([
         },
       ],
       content: [
+        {
+          type: "attachments"
+        },
         {
           type: "fields",
         },
