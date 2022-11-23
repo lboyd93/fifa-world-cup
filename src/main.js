@@ -126,7 +126,7 @@ require([
           relationshipId: 0,
           title: "Stadiums in {Country}",
           description:
-            "Largest stadiums played in for the FIFA World Cup from 1930-2018 in {COUNTRY} ordered by largest attendance.",
+            "Largest stadiums played in for the FIFA World Cup from 1930-2018 in {COUNTRY} ordered by largest capacity.",
           displayCount: 2,
           orderByFields: [
             {
