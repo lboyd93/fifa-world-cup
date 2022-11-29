@@ -13,4 +13,5 @@ When exploring a related feature's RelationshipContent, one could navigate into 
 | ![origin feature](resources/brazil-popup.png) | ![destination feature](resources/Brazil-related-feature.png) |
 
 Blog post: https://www.esri.com/arcgis-blog/products/js-api-arcgis/developers/browsing-related-records-with-the-arcgis-api-for-javascript
+
 Link to live sample: https://lboyd93.github.io/fifa-world-cup/
