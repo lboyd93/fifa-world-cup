@@ -10,7 +10,7 @@ When exploring a related feature's RelationshipContent, one could navigate into 
 
 | Origin Feature | Related Destination Feature |
 | -------------- | ------------- |
-| ![origin feature](../fifa-world-cup/resources/brazil-popup.png) | ![destination feature](../fifa-world-cup/resources/Brazil-related-feature.png) |
+| ![origin feature](resources/brazil-popup.png) | ![destination feature](resources/Brazil-related-feature.png) |
 
 Blog post: https://www.esri.com/arcgis-blog/products/js-api-arcgis/developers/browsing-related-records-with-the-arcgis-api-for-javascript
 Link to live sample: https://lboyd93.github.io/fifa-world-cup/
