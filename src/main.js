@@ -32,11 +32,12 @@ require([
         type: "simple-fill",
         color: null,
         outline: {
-          color: "#FEC310",
+          color: "grey",
           width: 0.5,
         },
       },
     },
+    effect: "drop-shadow(1px, 1px, 1px, white)",
     popupTemplate: {
       title: "{COUNTRY}",
       outFields: ["*"],
