@@ -10,7 +10,11 @@ When exploring a related feature's RelationshipContent, one could navigate into 
 
 | Origin Feature | Related Destination Feature |
 | -------------- | ------------- |
-| ![origin feature](resources/brazil-popup.png) | ![destination feature](resources/Brazil-related-feature.png) |
+| ![origin feature](resources/brazil-popup-multi.png) | ![destination feature](resources/related-feature.png) |
+
+There are two custom actions added to the pop-up:
+- `Zoom to Stadium` calls `goTo` on the view to zoom to the selected stadium. This only works when a stadium is in the popup. Note this does not work when viewing a stadium as a related record.
+- `Full Extent` resets the extent to the stadium layer's extent.
 
 Blog post: https://www.esri.com/arcgis-blog/products/js-api-arcgis/developers/browsing-related-records-with-the-arcgis-api-for-javascript
 

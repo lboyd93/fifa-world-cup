@@ -5,7 +5,8 @@ require([
   "esri/core/reactiveUtils",
   "esri/widgets/Legend",
   "esri/rest/query",
-], (Map, MapView, FeatureLayer, reactiveUtils, Legend, query) => {
+  "esri/widgets/Search",
+], (Map, MapView, FeatureLayer, reactiveUtils, Legend, query, Search) => {
   const map = new Map({
     basemap: "satellite",
   });
@@ -14,6 +15,10 @@ require([
     container: "viewDiv",
     map: map,
     popup: {
+      viewModel: {
+        // Removes the default actions on the popup
+        includeDefaultActions: false
+      },
       dockEnabled: true,
       dockOptions: {
         breakpoint: false,
@@ -44,6 +49,7 @@ require([
       fieldInfos: [],
       content: [
         {
+          // Create custom content
           type: "custom",
           outFields: ["*"],
           creator: async (event) => {
@@ -53,23 +59,29 @@ require([
               "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/FIFA_World_Cup/FeatureServer/2";
             let country = event.graphic.attributes["COUNTRY"];
 
-            let firstPlace = await query.executeForCount(queryUrl, {
+            // Query the statistics table for the number of times specific country has
+            // placed in the World Cups.
+            let firstPlace = await query
+              .executeForCount(queryUrl, {
                 // autocasts as new Query()
                 where: `First='${country}'`,
               })
-              .then((count) => {
+              .then(
+                (count) => {
                   return count;
                 },
                 (error) => {
                   console.log(error); // will print error in console if unsupported layers are used
                 }
               );
-            
-            let secondPlace = await query.executeForCount(queryUrl, {
+
+            let secondPlace = await query
+              .executeForCount(queryUrl, {
                 // autocasts as new Query()
                 where: `Second='${country}'`,
               })
-              .then((count) => {
+              .then(
+                (count) => {
                   return count;
                 },
                 (error) => {
@@ -77,11 +89,13 @@ require([
                 }
               );
 
-            let thirdPlace = await query.executeForCount(queryUrl, {
+            let thirdPlace = await query
+              .executeForCount(queryUrl, {
                 // autocasts as new Query()
                 where: `Third='${country}'`,
               })
-              .then((count) => {
+              .then(
+                (count) => {
                   return count;
                 },
                 (error) => {
@@ -89,11 +103,13 @@ require([
                 }
               );
 
-              let fourthPlace = await query.executeForCount(queryUrl, {
+            let fourthPlace = await query
+              .executeForCount(queryUrl, {
                 // autocasts as new Query()
                 where: `Fourth='${country}'`,
               })
-              .then((count) => {
+              .then(
+                (count) => {
                   return count;
                 },
                 (error) => {
@@ -108,6 +124,7 @@ require([
             return div;
           },
         },
+        // Add the relationship between the countries layer and the statistics table.
         {
           type: "relationship",
           relationshipId: 1,
@@ -115,6 +132,7 @@ require([
           description:
             "Every FIFA World Cup tournament {COUNTRY} has won first place in from 1930-2018 ordered by most recent.",
           displayCount: 2,
+          // Order the related features by year starting with most recent
           orderByFields: [
             {
               field: "YEAR",
@@ -122,22 +140,24 @@ require([
             },
           ],
         },
+        // Add the relationship between the countries and stadiums layers
         {
           type: "relationship",
           relationshipId: 0,
           title: "Stadiums in {Country}",
           description:
-            "Largest stadiums played in for the FIFA World Cup from 1930-2018 in {COUNTRY} ordered by largest capacity.",
+            "Stadiums played in for the FIFA World Cup from 1930-2018 in {COUNTRY} ordered by largest capacity.",
           displayCount: 2,
+          // Order the related features by highest capacity
           orderByFields: [
             {
               field: "Capacity",
               order: "desc",
             },
           ],
-        }
-      ]
-    }
+        },
+      ],
+    },
   });
 
   // Largest stadium locations for every FIFA World Cup.
@@ -147,6 +167,7 @@ require([
     popupTemplate: {
       title: "{StadiumName} ({Year})",
       outFields: ["*"],
+      // Configure FieldInfos to display in popup
       fieldInfos: [
         {
           fieldName: "City",
@@ -165,9 +186,10 @@ require([
           },
         },
       ],
+      // Add AttachmentsContent and FieldsContent to the popup
       content: [
         {
-          type: "attachments"
+          type: "attachments",
         },
         {
           type: "fields",
@@ -192,6 +214,7 @@ require([
     popupTemplate: {
       title: "FIFA World Cup {Year} Standings in {Host}",
       outFields: ["*"],
+      // Configure the FieldInfos to display in the popup
       fieldInfos: [
         {
           fieldName: "First",
@@ -251,5 +274,85 @@ require([
     });
   });
 
+  // Defines an action to zoom out from the selected feature
+  let zoomToFeatureAction = {
+    // This text is displayed as a tooltip
+    title: "Zoom to Stadium",
+    // The ID by which to reference the action in the event handler
+    id: "zoom-to",
+    // Sets the icon font used to style the action button
+    className: "esri-icon-zoom-in-magnifying-glass",
+  };
+
+  // Defines an action to zoom out from the selected feature
+  let zoomOutFullExtent = {
+    // This text is displayed as a tooltip
+    title: "Full Extent",
+    // The ID by which to reference the action in the event handler
+    id: "full-extent",
+    // Sets the icon font used to style the action button
+    className: "esri-icon-zoom-out-magnifying-glass",
+  };
+
+  // Adds the custom actions to the popup.
+  view.popup.actions.push(zoomToFeatureAction);
+  view.popup.actions.push(zoomOutFullExtent);
+
+  // The function to execute when the zoom-out action is clicked
+  function zoomIn(feature) {
+    // Check the feature belongs to the stadium layer
+    if (feature.layer.title === "FIFA World Cup Largest Stadiums") {
+      // in this case the view zooms to the feature
+      view.goTo({
+        target: feature.geometry,
+        zoom: 17,
+      });
+    }
+  }
+
+  // This event fires for each click on any action
+  view.popup.on("trigger-action", function (event) {
+    // If the zoom-to action is clicked, fire the zoomIn() function
+    if (event.action.id === "zoom-to") {
+      const popup = view.popup;
+      if (popup.features) {
+        zoomIn(popup.features[popup.selectedFeatureIndex]);
+      }
+    } // If the full-extent action is clicked, go to the layer's extent
+    else if (event.action.id === "full-extent") {
+      view.goTo({
+        target: stadiumLayer.fullExtent
+      });
+    }
+  });
+
+  // Add search widget with the layers as sources to allow for searching of features.
+  const search = new Search({
+    view: view,
+    includeDefaultSources: false,
+    activeSourceIndex: 0,
+    sources: [
+      // Add the feature layers as sources to search from.
+      {
+        layer: countriesLayer,
+        placeholder: "Argentina",
+        maxResults: 5,
+        searchFields: ["Country"],
+        displayField: "Country",
+        name: "Countries Layer",
+      },
+      {
+        layer: stadiumLayer,
+        placeholder: "Rose Bowl",
+        maxResults: 5,
+        searchFields: ["StadiumName"],
+        displayField: "StadiumName",
+        name: "Stadiums",
+      },
+    ],
+  });
+
+  // Add the widgets to the view.
   view.ui.add(new Legend({ view: view }), "bottom-left");
+  view.ui.add(search, "bottom-right");
 });
