@@ -7,6 +7,7 @@ require([
   "esri/rest/query",
   "esri/widgets/Search",
 ], (Map, MapView, FeatureLayer, reactiveUtils, Legend, query, Search) => {
+  const alert = document.getElementById("alert");
   const map = new Map({
     basemap: "satellite",
   });
@@ -17,7 +18,7 @@ require([
     popup: {
       viewModel: {
         // Removes the default actions on the popup
-        includeDefaultActions: false
+        includeDefaultActions: false,
       },
       dockEnabled: true,
       dockOptions: {
@@ -277,7 +278,7 @@ require([
   // Defines an action to zoom out from the selected feature
   let zoomToFeatureAction = {
     // This text is displayed as a tooltip
-    title: "Zoom to Stadium",
+    title: "Zoom to Selected Stadium",
     // The ID by which to reference the action in the event handler
     id: "zoom-to",
     // Sets the icon font used to style the action button
@@ -295,8 +296,8 @@ require([
   };
 
   // Adds the custom actions to the popup.
-  view.popup.actions.push(zoomToFeatureAction);
   view.popup.actions.push(zoomOutFullExtent);
+  view.popup.actions.push(zoomToFeatureAction);
 
   // The function to execute when the zoom-out action is clicked
   function zoomIn(feature) {
@@ -307,6 +308,8 @@ require([
         target: feature.geometry,
         zoom: 17,
       });
+    }else{
+      alert.open = true;
     }
   }
 
@@ -314,14 +317,13 @@ require([
   view.popup.on("trigger-action", function (event) {
     // If the zoom-to action is clicked, fire the zoomIn() function
     if (event.action.id === "zoom-to") {
-      const popup = view.popup;
-      if (popup.features) {
-        zoomIn(popup.features[popup.selectedFeatureIndex]);
+      if (view.popup.selectedFeature) {
+        zoomIn(view.popup.selectedFeature);
       }
     } // If the full-extent action is clicked, go to the layer's extent
     else if (event.action.id === "full-extent") {
       view.goTo({
-        target: stadiumLayer.fullExtent
+        target: stadiumLayer.fullExtent,
       });
     }
   });
