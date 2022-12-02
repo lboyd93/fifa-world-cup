@@ -17,7 +17,6 @@ require([
     map: map,
     popup: {
       viewModel: {
-        // Removes the default actions on the popup
         includeDefaultActions: false,
       },
       dockEnabled: true,
@@ -196,6 +195,24 @@ require([
           type: "fields",
         },
       ],
+      actions: [
+        {
+          // This text is displayed as a tooltip
+          title: "Zoom to Selected Stadium",
+          // The ID by which to reference the action in the event handler
+          id: "zoom-stadium",
+          // Sets the icon font used to style the action button
+          className: "esri-icon-zoom-in-magnifying-glass",
+        },
+        {
+          // This text is displayed as a tooltip
+          title: "Full Extent",
+          // The ID by which to reference the action in the event handler
+          id: "full-extent",
+          // Sets the icon font used to style the action button
+          className: "esri-icon-zoom-out-magnifying-glass",
+        },
+      ],
     },
     renderer: {
       type: "simple",
@@ -275,48 +292,19 @@ require([
     });
   });
 
-  // Defines an action to zoom out from the selected feature
-  let zoomToFeatureAction = {
-    // This text is displayed as a tooltip
-    title: "Zoom to Selected Stadium",
-    // The ID by which to reference the action in the event handler
-    id: "zoom-to",
-    // Sets the icon font used to style the action button
-    className: "esri-icon-zoom-in-magnifying-glass",
-  };
-
-  // Defines an action to zoom out from the selected feature
-  let zoomOutFullExtent = {
-    // This text is displayed as a tooltip
-    title: "Full Extent",
-    // The ID by which to reference the action in the event handler
-    id: "full-extent",
-    // Sets the icon font used to style the action button
-    className: "esri-icon-zoom-out-magnifying-glass",
-  };
-
-  // Adds the custom actions to the popup.
-  view.popup.actions.push(zoomOutFullExtent);
-  view.popup.actions.push(zoomToFeatureAction);
-
-  // The function to execute when the zoom-out action is clicked
+  // The function to execute when the zoom-stadium action is clicked
   function zoomIn(feature) {
-    // Check the feature belongs to the stadium layer
-    if (feature.layer.title === "FIFA World Cup Largest Stadiums") {
-      // in this case the view zooms to the feature
-      view.goTo({
-        target: feature.geometry,
-        zoom: 17,
-      });
-    }else{
-      alert.open = true;
-    }
+    // Zooms to the feature at level 17
+    view.goTo({
+      target: feature.geometry,
+      zoom: 17,
+    });
   }
 
   // This event fires for each click on any action
   view.popup.on("trigger-action", function (event) {
-    // If the zoom-to action is clicked, fire the zoomIn() function
-    if (event.action.id === "zoom-to") {
+    // If the zoom-stadium action is clicked, fire the zoomIn() function
+    if (event.action.id === "zoom-stadium") {
       if (view.popup.selectedFeature) {
         zoomIn(view.popup.selectedFeature);
       }
@@ -332,12 +320,12 @@ require([
   const search = new Search({
     view: view,
     includeDefaultSources: false,
-    activeSourceIndex: 0,
+    allPlaceholder: "Find country or stadium",
     sources: [
       // Add the feature layers as sources to search from.
       {
         layer: countriesLayer,
-        placeholder: "Argentina",
+        placeholder: "Find a country",
         maxResults: 5,
         searchFields: ["Country"],
         displayField: "Country",
@@ -345,7 +333,7 @@ require([
       },
       {
         layer: stadiumLayer,
-        placeholder: "Rose Bowl",
+        placeholder: "Find a stadium",
         maxResults: 5,
         searchFields: ["StadiumName"],
         displayField: "StadiumName",
