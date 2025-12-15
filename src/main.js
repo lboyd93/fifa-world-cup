@@ -261,6 +261,30 @@ popupComponent.open({
   fetchFeatures: true,
 });
 
+const searchComponent = document.querySelector("arcgis-search");
+await searchComponent.componentOnReady();
+searchComponent.sources = [
+  // Add the feature layers as sources to search from.
+  {
+    layer: countriesLayer,
+    placeholder: "Find a country",
+    maxResults: 5,
+    searchFields: ["Country"],
+    displayField: "Country",
+    name: "Countries Layer",
+	exactMatch: false,
+	outFields: ["*"],
+  },
+  {
+    layer: stadiumLayer,
+    placeholder: "Find a stadium",
+    maxResults: 5,
+    searchFields: ["StadiumName"],
+    displayField: "StadiumName",
+    name: "Stadiums",
+  },
+];
+
 // This event fires for each click on any action
 reactiveUtils.on(
   () => popupComponent,
@@ -283,23 +307,3 @@ reactiveUtils.on(
     }
   }
 );
-const searchComponent = document.createElement("arcgis-search");
-searchComponent.sources = [
-  // Add the feature layers as sources to search from.
-  {
-    layer: countriesLayer,
-    placeholder: "Find a country",
-    maxResults: 5,
-    searchFields: ["Country"],
-    displayField: "Country",
-    name: "Countries Layer",
-  },
-  {
-    layer: stadiumLayer,
-    placeholder: "Find a stadium",
-    maxResults: 5,
-    searchFields: ["StadiumName"],
-    displayField: "StadiumName",
-    name: "Stadiums",
-  },
-];
