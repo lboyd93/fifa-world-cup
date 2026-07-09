@@ -57,7 +57,7 @@ const countriesLayer = new FeatureLayer({
               },
               (error) => {
                 console.log(error); // will print error in console if unsupported layers are used
-              }
+              },
             );
 
           let secondPlace = await query
@@ -71,7 +71,7 @@ const countriesLayer = new FeatureLayer({
               },
               (error) => {
                 console.log(error); // will print error in console if unsupported layers are used
-              }
+              },
             );
 
           let thirdPlace = await query
@@ -85,7 +85,7 @@ const countriesLayer = new FeatureLayer({
               },
               (error) => {
                 console.log(error); // will print error in console if unsupported layers are used
-              }
+              },
             );
 
           let fourthPlace = await query
@@ -99,7 +99,7 @@ const countriesLayer = new FeatureLayer({
               },
               (error) => {
                 console.log(error); // will print error in console if unsupported layers are used
-              }
+              },
             );
           div.innerHTML += `Out of all FIFA World Cup tournaments from 1930-2018, ${country} has won: 
             <li>First place <b>${firstPlace}</b> times</li> 
@@ -255,11 +255,11 @@ countriesQuery.outFields = countriesLayerView.availableFields;
 // Query for Brazil and open it's popup.
 const results = await countriesLayerView.queryFeatures(countriesQuery);
 const centroid = centroidOperator.execute(results.features[0].geometry);
-popupComponent.open({
-  features: results.features[0],
-  location: centroid,
-  fetchFeatures: true,
-});
+const brazilFeature = results.features[0];
+brazilFeature.popupTemplate = countriesLayer.popupTemplate;
+popupComponent.features = [brazilFeature];
+popupComponent.location = centroid;
+popupComponent.open = true;
 
 const searchComponent = document.querySelector("arcgis-search");
 await searchComponent.componentOnReady();
@@ -272,8 +272,8 @@ searchComponent.sources = [
     searchFields: ["Country"],
     displayField: "Country",
     name: "Countries Layer",
-	exactMatch: false,
-	outFields: ["*"],
+    exactMatch: false,
+    outFields: ["*"],
   },
   {
     layer: stadiumLayer,
@@ -305,5 +305,5 @@ reactiveUtils.on(
         target: stadiumLayer.fullExtent,
       });
     }
-  }
+  },
 );
